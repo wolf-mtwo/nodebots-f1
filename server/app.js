@@ -2,8 +2,14 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var Gpio = require('onoff').Gpio;
 var path = require("path");
 var fs = require('fs');
+var RaspiCam = require("raspicam");
+
+var camera = new RaspiCam({ mode:"photo", output:"./server/stream/image.jpg", timelapse: 3000 });
+
+
 app.use(express.static(path.join(__dirname + '/../public')));
 app.use(express.static(path.join(__dirname + '/../bower_components')));
 
@@ -13,8 +19,22 @@ app.get('/', function (req, res) {
 
 io.on('connection', function(socket) {
   socket.on('msg', function(msg) {
-    console.log(msg);
-    // io.emit('chat message', msg);
+
+    gpio.reset();
+
+    if (msg.v > 0) {
+      gpio.move('forward');
+    }
+    if (msg.v < 0) {
+      gpio.move('back');
+    }
+
+    if (msg.h > 0) {
+      gpio.move('right');
+    }
+    if (msg.h < 0) {
+      gpio.move('left');
+    }
   });
 
   socket.on('start-stream', function() {
@@ -29,57 +49,63 @@ setInterval(function(){
 http.listen(3000, function () {
   console.log('listenin on *:3000');
 });
+//
 
 
 function startStreaming(io) {
+  camera.start();
 
-  // if (app.get('watchingFile')) {
-  //   io.sockets.emit('liveStream', 'image_stream.jpg?_t=' + (Math.random() * 100000));
-  //   return;
-  // }
-  //
-  // var args = ["-w", "640", "-h", "480", "-o", "./stream/image_stream.jpg", "-t", "999999999", "-tl", "100"];
-  // proc = spawn('raspistill', args);
-  //
-  // console.log('Watching for changes...');
-  //
-  // app.set('watchingFile', true);
+  camera.on("read", function(err, timestamp, filename){
+    //do stuff
+    console.log('ñeeeeeeee');
+    console.log(filename);
+  });
 
-  // fs.watchFile('./server/stream/parser.jpg', function(current, previous) {
-  //   console.log('change');
-    // console.log(current);
-    // console.log(previous);
-    // fs.readFile('./stream/parser.jpg', {encoding: "base64"}, function (err, data) {
-    setInterval(function() {
-      fs.readFile('./server/stream/parser.jpg', {encoding: "base64"}, function (err, data) {
-        if (err) {
-          console.log(err.message);
-          console.log('IMAGE DOES NOT EXIT');
-          return;
-        }
-        console.log('sent');
-        io.sockets.emit('liveStream',{data:data});
-      });
-    }, 100);
+    // setInterval(function() {
+    //   fs.readFile('./server/stream/parser.jpg', {encoding: "base64"}, function (err, data) {
+    //     if (err) {
+    //       console.log(err.message);
+    //       console.log('IMAGE DOES NOT EXIT');
+    //       return;
+    //     }
+    //     console.log('sent');
+    //     io.sockets.emit('liveStream',{data:data});
+    //   });
+    // }, 10000);
 
   // })
 }
 
-function() {
-  var Gpio = require('onoff').Gpio;
+startStreaming(io);
 
-  var  iv;
+var gpio = (function(module) {
+
   var drive = {
     led: new Gpio(14, 'out'),
     forward: new Gpio(15, 'out'),
     back: new Gpio(18, 'out'),
     left: new Gpio(23, 'out'),
-    right: new Gpio(25, 'out')
+    right: new Gpio(24, 'out')
   }
 
-  var params = process.argv[2];
-  console.log(params);
-  drive[params].writeSync(1);
-}
+  module.move = function(direction) {
+    if (drive[direction]) {
+      drive[direction].writeSync(1);
+    } else {
+      console.log('command not found');
+    }
+  }
 
-startStreaming(io);
+  module.reset = function() {
+    for(var i in drive) {
+      drive[i].writeSync(0);
+    }
+    drive['led'].writeSync(1);
+  }
+
+  return module;
+})({});
+
+setTimeout(function(){
+  camera.stop();
+}, 20000);
