@@ -7,7 +7,14 @@ var path = require("path");
 var fs = require('fs');
 var RaspiCam = require("raspicam");
 
-var camera = new RaspiCam({ mode:"photo", output:"./server/stream/image.jpg", timelapse: 3000 });
+var options = {
+  mode: "photo",
+  output: "./server/stream/parser.jpg",
+  timelapse: 1000,
+  width : 320,
+  height: 240
+};
+var camera = new RaspiCam(options);
 
 
 app.use(express.static(path.join(__dirname + '/../public')));
@@ -56,24 +63,16 @@ function startStreaming(io) {
   camera.start();
 
   camera.on("read", function(err, timestamp, filename){
-    //do stuff
-    console.log('ñeeeeeeee');
-    console.log(filename);
+    fs.readFile('./server/stream/parser.jpg', {encoding: "base64"}, function (err, data) {
+      if (err) {
+        console.log(err.message);
+        console.log('IMAGE DOES NOT EXIT');
+        return;
+      }
+      console.log('sent');
+      io.sockets.emit('liveStream',{data:data});
+    });
   });
-
-    // setInterval(function() {
-    //   fs.readFile('./server/stream/parser.jpg', {encoding: "base64"}, function (err, data) {
-    //     if (err) {
-    //       console.log(err.message);
-    //       console.log('IMAGE DOES NOT EXIT');
-    //       return;
-    //     }
-    //     console.log('sent');
-    //     io.sockets.emit('liveStream',{data:data});
-    //   });
-    // }, 10000);
-
-  // })
 }
 
 startStreaming(io);
@@ -108,4 +107,4 @@ var gpio = (function(module) {
 
 setTimeout(function(){
   camera.stop();
-}, 20000);
+}, 500000);
