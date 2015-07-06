@@ -8,12 +8,15 @@ var fs = require('fs');
 var RaspiCam = require("raspicam");
 
 var options = {
-  mode: "photo",
+  mode: "timelapse",
   output: "./server/stream/parser.jpg",
-  timelapse: 1000,
+  timelapse: 3000,
   width : 320,
-  height: 240
+  height: 240,
+  timeout: 30000
 };
+
+var cameraState = false;
 var camera = new RaspiCam(options);
 
 
@@ -56,13 +59,22 @@ setInterval(function(){
 http.listen(3000, function () {
   console.log('listenin on *:3000');
 });
-//
 
+function cameraStop() {
+  camera.stop();
+}
 
 function startStreaming(io) {
-  camera.start();
 
-  camera.on("read", function(err, timestamp, filename){
+  if (!cameraState) {
+    camera.start();
+    cameraState = true;
+  }
+
+  camera.on("read", function(err, timestamp, filename) {
+    if (filename.length >= 11) {
+      return;
+    }
     fs.readFile('./server/stream/parser.jpg', {encoding: "base64"}, function (err, data) {
       if (err) {
         console.log(err.message);
@@ -75,10 +87,7 @@ function startStreaming(io) {
   });
 }
 
-startStreaming(io);
-
 var gpio = (function(module) {
-
   var drive = {
     led: new Gpio(14, 'out'),
     forward: new Gpio(15, 'out'),
@@ -104,7 +113,3 @@ var gpio = (function(module) {
 
   return module;
 })({});
-
-setTimeout(function(){
-  camera.stop();
-}, 500000);
