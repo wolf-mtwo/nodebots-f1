@@ -1,11 +1,19 @@
+var onRasp = false;
+var RaspiCam, Gpio = null;
+if (onRasp) {
+  RaspiCam = require("raspicam");
+  Gpio = require('onoff').Gpio;
+} else {
+  RaspiCam = require("./mock/raspicam");
+  Gpio = require('./mock/onoff');
+}
+
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var Gpio = require('onoff').Gpio;
 var path = require("path");
 var fs = require('fs');
-var RaspiCam = require("raspicam");
 
 var options = {
   mode: "timelapse",

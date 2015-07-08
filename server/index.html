@@ -5,6 +5,7 @@
     <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/angular/angular.js"></script>
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.css" media="screen" title="no title" charset="utf-8">
   </head>
 <style media="screen">
 .main {
@@ -50,8 +51,21 @@
   height: 33%;
 }
 </style>
-
   <body ng-app="main">
+    <div class="container">
+      <h1 class="text-center">My Aquarium
+        <small>Powered by PI</small>
+      </h1>
+
+      <hr>
+
+      <button type="button" id="" class="btn btn-info start" onclick="startStream()">Start Camera</button>
+
+      <div class="row">
+        <img src="" id="stream">
+      </div>
+    </div>
+
     <div ng-controller="mainController">
       <div class="main">
         <div class="left">
