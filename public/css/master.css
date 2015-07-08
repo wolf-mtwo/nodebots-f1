@@ -1,3 +1,10 @@
 h1 {
   color: black;
 }
+img {
+  max-width: 250px;
+  height: auto;
+}
+.control-btns div {
+  padding-top: 5px;
+}

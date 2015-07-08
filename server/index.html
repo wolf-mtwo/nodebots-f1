@@ -1,97 +1,62 @@
+<!doctype html>
 <html>
   <head>
-    <title>Demo</title>
+    <title>NodeBot</title>
     <link rel="stylesheet" href="/css/master.css" media="screen" charset="utf-8">
     <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/angular/angular.js"></script>
     <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.css" media="screen" title="no title" charset="utf-8">
   </head>
-<style media="screen">
-.main {
-  width: 100%;
-  height: 100%;
-}
-
-.main div {
-  float: left;
-}
-
-.main .left {
-  width: 80%;
-  height: 100%;
-}
-
-.main .left .top {
-  height: 65%;
-  width: 100%;
-}
-
-.main .left .bottom {
-  width: 100%;
-  height: 35%;
-  background: black;
-}
-
-.main .left .bottom div {
-  width: 33%;
-  background: white;
-  height: 100%;
-}
-
-.main .rigth {
-  width: 20%;
-  background: black;
-  height: 100%;
-}
-
-.main .rigth div {
-  width: 100%;
-  background: white;
-  height: 33%;
-}
-</style>
   <body ng-app="main">
-    <div class="container">
-      <h1 class="text-center">My Aquarium
-        <small>Powered by PI</small>
+    <div class="container" ng-controller="mainController">
+      <h1 class="text-center">NodeBot - f1
+        <small>Powered by Wargos</small>
       </h1>
-
       <hr>
-
-      <button type="button" id="" class="btn btn-info start" onclick="startStream()">Start Camera</button>
-
-      <div class="row">
-        <img src="" id="stream">
+      <div class="row text-center">
+        <img src="/images/wargos-logo.png"/>
+        <img src="data:image/jpeg;base64,{{imagedata}}"/>
       </div>
-    </div>
-
-    <div ng-controller="mainController">
-      <div class="main">
-        <div class="left">
-          <div class="top">
-            <img    src="data:image/jpeg;base64,{{imagedata}}"/>
-          </div>
-          <div class="bottom">
-            <div>a</div>
-            <div>=</div>
-            <div>d</div>
-          </div>
+      <div class="row text-center control-btns">
+        <div>
+          <button type="button" id="" class="btn btn-info start" onclick="startStream()">
+            <span class="">-</span>
+          </button>
+          <button type="button" id="" class="btn btn-info start" onclick="startStream()">
+            <span class="glyphicon glyphicon-triangle-top"></span>
+          </button>
+          <button type="button" id="" class="btn btn-info start" onclick="startStream()">
+            <span class="">-</span>
+          </button>
         </div>
-        <div class="rigth">
-          <div>w</div>
-          <div>r</div>
-          <div>s</div>
+        <div>
+          <button type="button" id="" class="btn btn-info start" onclick="left()">
+            <span class="glyphicon glyphicon-triangle-left"></span>
+          </button>
+          <button type="button" id="" class="btn btn-info start" onclick="left()">
+            <span class="glyphicon glyphicon-ban-circle"></span>
+          </button>
+          <button type="button" id="" class="btn btn-info start" onclick="startStream()">
+            <span class="glyphicon glyphicon-triangle-right"></span>
+          </button>
+        </div>
+        <div>
+          <button type="button" id="" class="btn btn-info start" onclick="startStream()">
+            <span class="">-</span>
+          </button>
+          <button type="button" id="" class="btn btn-info start" onclick="startStream()">
+            <span class="glyphicon glyphicon-triangle-bottom"></span>
+          </button>
+          <button type="button" id="" class="btn btn-info start" onclick="startStream()">
+            <span class="">-</span>
+          </button>
         </div>
       </div>
-    </div>
+
+
   </body>
 <script type="text/javascript">
-// object.addEventListener("keypress", function(event){
-//   console.log(event);
-// });
-
-
 
 (function(module){
   var socket = io();
