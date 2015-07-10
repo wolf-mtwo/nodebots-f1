@@ -6,6 +6,10 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/angular/angular.js"></script>
 
+    <!-- local modules -->
+    <script src="/js/key-monitor.js"></script>
+    <script src="/js/socket-event-manager.js"></script>
+
     <!-- angular app -->
     <script src="/app/app.js"></script>
     <script src="/app/controllers/main.js"></script>
@@ -19,6 +23,12 @@
     <div class="container" ng-controller="mainController">
       <h1 class="text-center">NodeBot - f1
         <small>Powered by Wargos</small>
+        <button type="button"
+                class="btn btn-info"
+                bg-click="startStreaming()">
+          <span class="glyphicon glyphicon-facetime-video"></span>
+          <span class="">Video</span>
+        </button>
       </h1>
       <hr>
       <div class="row text-center">
@@ -26,48 +36,52 @@
         <img src="data:image/jpeg;base64,{{imagedata}}"/>
       </div>
       <div class="row text-center control-btns">
+        <div ng-repeat="btns in control">
+          <button type="button"
+                  ng-repeat="btn in btns"
+                  class="btn btn-info"
+                  ng-click="move(btn)">
+            <div ng-if="btn.icon">
+              <span ng-class="buildIcon(btn.icon)"></span>  
+            </div>
+            <div ng-if="!btn.icon">
+              <span>-</span>  
+            </div>
+          </button>
+        </div>
         <div>
-          <button type="button" id="" class="btn btn-info start" onclick="startStream()">
+          <button type="button" id="" class="btn btn-info start" onclick="move()">
             <span class="">-</span>
           </button>
-          <button type="button" id="" class="btn btn-info start" onclick="startStream()">
+          <button type="button" id="" class="btn btn-info start" onclick="move()">
             <span class="glyphicon glyphicon-triangle-top"></span>
           </button>
-          <button type="button" id="" class="btn btn-info start" onclick="startStream()">
+          <button type="button" id="" class="btn btn-info start" onclick="move()">
             <span class="">-</span>
           </button>
         </div>
         <div>
-          <button type="button" id="" class="btn btn-info start" onclick="left()">
+          <button type="button" id="" class="btn btn-info start" onclick="move()">
             <span class="glyphicon glyphicon-triangle-left"></span>
           </button>
-          <button type="button" id="" class="btn btn-info start" onclick="left()">
+          <button type="button" id="" class="btn btn-info start" onclick="move()">
             <span class="glyphicon glyphicon-ban-circle"></span>
           </button>
-          <button type="button" id="" class="btn btn-info start" onclick="startStream()">
+          <button type="button" id="" class="btn btn-info start" onclick="move()">
             <span class="glyphicon glyphicon-triangle-right"></span>
           </button>
         </div>
         <div>
-          <button type="button" id="" class="btn btn-info start" onclick="startStream()">
+          <button type="button" id="" class="btn btn-info start" onclick="move()">
             <span class="">-</span>
           </button>
-          <button type="button" id="" class="btn btn-info start" onclick="startStream()">
+          <button type="button" id="" class="btn btn-info start" onclick="move()">
             <span class="glyphicon glyphicon-triangle-bottom"></span>
           </button>
-          <button type="button" id="" class="btn btn-info start" onclick="startStream()">
+          <button type="button" id="" class="btn btn-info start" onclick="move()">
             <span class="">-</span>
           </button>
         </div>
       </div>
   </body>
-<script type="text/javascript">
-document.onkeypress = function(e) {
-  if(run[e.keyCode]) {
-    run[e.keyCode]();
-  } else {
-    console.info('invalid command:', e.keyCode);
-  }
-}
-</script>
 </html>

@@ -1,47 +1,58 @@
-(function(module){
+//Repeat code for front-end and back-end
+//server/server-manager.js
+//public/js/socker-event-manager.js
+var CHANNELS = {
+  CMD: 'command',
+  MESSAGE: 'msg',
+  CAMERA: {
+    STREAM: 'live-stream',
+    STOP: 'start-stream',
+    START: 'stop-stream'
+  }
+};
+
+(function(module) {
+
   var socket = io();
-  module.version = "v0.0.1";
-  var socketModule = module.socket = (function(module) {
+
+  module.socket = (function(module) {
+
     module.emit = function (msg) {
       console.info('sent:', msg);
       socket.emit('msg', msg);
     }
+
     module.on = function (callback) {
-      socket.on('msg', function(msg) {
-        console.info('recive:', msg);
-        callback(msg);
+      socket.on(CHANNELS.MESSAGE, function(message) {
+        console.info('recive:', message);
+        
       });
     }
 
     module.streaming = function (callback) {
-      socket.on('liveStream', function(msg) {
+      socket.on('live-stream', function(msg) {
         console.info('recive liveStream:', 'ok!');
         callback(msg);
       });
     }
-    return module;
-  })({});
 
-  module.move = (function(module) {
-
-    module.state = (function(module) {
-      var state = {v: 0,h: 0};
-      var old = null;
-      module.reset = function() {
-        return state = {v: 0,h: 0}
+    module.camera = (function(module){
+      module.start = function (callback) {
+        socket.on('start-stream', function(msg) {
+          console.info('recive liveStream:', 'ok!');
+          callback(msg);
+        });
       }
-      module.change = function(command) {
-        switch (command) {
-          case 'v+': state.v = old == command ? state.v : 0; state.v++; break;
-          case 'v-': state.v = old == command ? state.v : 0; state.v--; break;
-          case 'h+': state.h++; break;
-          case 'h-': state.h--; break;
-          default:
-            console.error('there is no command:', command);
-            break;
-        }
-        old = command;
-        return state;
+
+      module.stop = function (callback) {
+        socket.on('stop-stream', function(msg) {
+          console.info('recive liveStream:', 'ok!');
+          callback(msg);
+        });
       }
       return module;
-    })({});
+    })(module);    
+
+    window.SocketManager = module;
+  })({});
+})({});

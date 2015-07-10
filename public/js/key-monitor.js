@@ -1,7 +1,7 @@
 (function(module){
 
   module.move = (function(module) {
-
+    
     module.state = (function(module) {
       var state = {v: 0,h: 0};
       var old = null;
@@ -17,6 +17,7 @@
           default:
             console.error('there is no command:', command);
             break;
+
         }
         old = command;
         return state;
@@ -56,3 +57,11 @@
 
   window.remote = module;
 })({});
+
+document.onkeypress = function(e) {
+  if(run[e.keyCode]) {
+    run[e.keyCode]();
+  } else {
+    console.info('invalid command:', e.keyCode);
+  }
+}
