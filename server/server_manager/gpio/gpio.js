@@ -1,67 +1,53 @@
-// gpio.reset();
+var utils = require('../utils');
+var fs = require('fs');
+var decode = require('./decode');
 
-//   if (msg.v > 0) {
-//   gpio.move('forward');
-//   }
-//   if (msg.v < 0) {
-//   gpio.move('back');
-//   }
+var Gpio = null;
+if (utils.getEnvironmentState()) {
+  Gpio = require("onoff");
+} else {
+  Gpio = require("../../mock/onoff");
+}
 
-//   if (msg.h > 0) {
-//   gpio.move('right');
-//   }
-//   if (msg.h < 0) {
-//   gpio.move('left');
-//   }
+module.exports = (function(module) {
 
-// io.on('connection', function(socket) {
-//   socket.on('msg', function(msg) {
+  module.exec = function(command) {
+    console.log('executed:', command);
+    var commands = decode.command(command);
+    module.GpioFacede.moveMany(commands);
+  }
 
-//     gpio.reset();
+  module.GpioFacede = (function(module) {
 
-//     if (msg.v > 0) {
-//       gpio.move('forward');
-//     }
-//     if (msg.v < 0) {
-//       gpio.move('back');
-//     }
+    var drive = {
+      led: new Gpio(14, 'out'),
+      forward: new Gpio(15, 'out'),
+      back: new Gpio(18, 'out'),
+      left: new Gpio(23, 'out'),
+      right: new Gpio(24, 'out')
+    };
 
-//     if (msg.h > 0) {
-//       gpio.move('right');
-//     }
-//     if (msg.h < 0) {
-//       gpio.move('left');
-//     }
-//   });
+    module.moveMany = function(commands) {
+      if (!(commands instanceof Array)) {
+        throw new Error('command should be array');
+      }
+      for (var i in commands) {
+        module.changeState(commands[i])
+      }
+    }
 
-//   socket.on('start-stream', function() {
-//     startStreaming(io);
-//   });
-// });
+    module.changeState = function(commandState) {
+      if (!commandState) throw new error('commandState is undefined');
+      var gpio = drive[commandState.command];
+      if (gpio) {
+        gpio.writeSync(commandState.value);
+      } else {
+        console.log('command not found', commandState);
+      }
+    }
 
-// var gpio = (function(module) {
-//   var drive = {
-//     led: new Gpio(14, 'out'),
-//     forward: new Gpio(15, 'out'),
-//     back: new Gpio(18, 'out'),
-//     left: new Gpio(23, 'out'),
-//     right: new Gpio(24, 'out')
-//   }
+    return module;
+  })({});
 
-//   module.move = function(direction) {
-//     if (drive[direction]) {
-//       drive[direction].writeSync(1);
-//     } else {
-//       console.log('command not found');
-//     }
-//   }
-
-//   module.reset = function() {
-//     for(var i in drive) {
-//       drive[i].writeSync(0);
-//     }
-//     drive['led'].writeSync(1);
-//   }
-
-//   return module;
-// })({});
+  return module;
+})({});

@@ -1,51 +1,63 @@
-// var onRasp = false;
-// var RaspiCam, Gpio = null;
-// if (onRasp) {
-//   RaspiCam = require("raspicam");
-//   Gpio = require('onoff').Gpio;
-// } else {
-//   RaspiCam = require("./mock/raspicam");
-//   Gpio = require('./mock/onoff');
-// }
+var utils = require('../utils');
+var fs = require('fs');
 
+var RaspiCam = null;
+if (utils.getEnvironmentState()) {
+  RaspiCam = require("raspicam");
+} else {
+  RaspiCam = require("../../mock/raspicam");
+}
 
-// var options = {
-//   mode: "timelapse",
-//   output: "./server/stream/parser.jpg",
-//   timelapse: 3000,
-//   width : 320,
-//   height: 240,
-//   timeout: 30000
-// };
+module.exports = (function(module) {
 
-// var cameraState = false;
-// var camera = new RaspiCam(options);
+  // Camera options
+  var options = {
+    mode: "timelapse",
+    output: "./server/stream/parser.jpg",
+    timelapse: 3000,
+    width : 320,
+    height: 240,
+    timeout: 600000
+  };
 
+  var CAMERA_STATE = false;
+  var camera = new RaspiCam(options);
 
-// function cameraStop() {
-//   camera.stop();
-// }
+  module.start = function(callback) {
+    if (!CAMERA_STATE) {
+        camera.start();
+        CAMERA_STATE = true;
+        module.streaming(callback);
+    } else {
+      console.log('the camera has the next state [START]');
+    }
+  }
 
-//var fs = require('fs');
-// function startStreaming(io) {
+  module.stop = function() {
+    if (CAMERA_STATE) {
+      camera.stop();
+      CAMERA_STATE = false;
+    } else {
+      console.log('the camera has the next state [STOP]');
+    }
+  }
 
-//   if (!cameraState) {
-//     camera.start();
-//     cameraState = true;
-//   }
+  module.streaming = function(callback) {
+    camera.on('read', function(err, timestamp, filename) {
+      if (!CAMERA_STATE) return;
+      if (filename.length >= 11) return;
+      fs.readFile('./server/stream/parser.jpg',
+        {encoding: "base64"},
+        function (err, data) {
+        if (err) {
+          console.log(err.message);
+          console.log('IMAGE DOES NOT EXIT');
+          return;
+        }
+        callback(data);
+      });
+    });
+  }
 
-//   camera.on("read", function(err, timestamp, filename) {
-//     if (filename.length >= 11) {
-//       return;
-//     }
-//     fs.readFile('./server/stream/parser.jpg', {encoding: "base64"}, function (err, data) {
-//       if (err) {
-//         console.log(err.message);
-//         console.log('IMAGE DOES NOT EXIT');
-//         return;
-//       }
-//       console.log('sent');
-//       io.sockets.emit('liveStream',{data:data});
-//     });
-//   });
-// }
+  return module;
+})({});

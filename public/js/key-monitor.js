@@ -1,67 +1,47 @@
-(function(module){
+(function(module) {
 
-  module.move = (function(module) {
-    
-    module.state = (function(module) {
-      var state = {v: 0,h: 0};
-      var old = null;
-      module.reset = function() {
-        return state = {v: 0,h: 0}
-      }
-      module.change = function(command) {
-        switch (command) {
-          case 'v+': state.v = old == command ? state.v : 0; state.v++; break;
-          case 'v-': state.v = old == command ? state.v : 0; state.v--; break;
-          case 'h+': state.h++; break;
-          case 'h-': state.h--; break;
-          default:
-            console.error('there is no command:', command);
-            break;
+  if (!CmdBuilder) {
+    throw new Error('CmdBuilder is not loaded');
+  };
 
-        }
-        old = command;
-        return state;
-      }
-      return module;
-    })({});
+  var move = CmdBuilder.move;
 
-    module.forward = function(callback) {
-      console.log('Event forward:');
-      socketModule.emit(module.state.change('v+'));
-    }
-    module.back = function(callback) {
-      console.log('Event back:');
-      socketModule.emit(module.state.change('v-'));
-    }
-    module.left = function(callback) {
-      console.log('Event left:');
-      socketModule.emit(module.state.change('h-'));
-    }
-    module.right = function(callback) {
-      console.log('Event right:');
-      socketModule.emit(module.state.change('h+'));
-    }
-    module.reset = function(callback) {
-      console.log('Event reset:');
-      socketModule.emit(module.state.reset());
-    }
-    window.run = {
-      '119': module.forward,
-      '115': module.back,
-      '97': module.left,
-      '100': module.right,
-      '114': module.reset
-    };
-    return module;
-  })({});
+  function addEmpty(cmd) {
+    return CmdBuilder.setDefault(cmd)
+  }
 
-  window.remote = module;
+  module.move = {
+    '119': addEmpty(move.forward()),
+    '115': addEmpty(move.back()),
+    '97': addEmpty(move.left()),
+    '100': addEmpty(move.right()),
+    '114': addEmpty(),
+    '55': addEmpty(move.forward(move.left())),
+    '56': addEmpty(move.forward()),
+    '57': addEmpty(move.forward(move.right())),
+    '52': addEmpty(move.left()),
+    '53': addEmpty(),
+    '54': addEmpty(move.right()),
+    '49': addEmpty(move.back(move.left())),
+    '50': addEmpty(move.back()),
+    '51': addEmpty(move.back(move.right()))
+  };
+
+  module.run = function(keyCode) {
+    if(module.move[keyCode]) {
+      EventManager.emit.command(module.move[keyCode]);
+    } else {
+      console.info('invalid command:', keyCode);
+    }
+  }
+
+  // Browser key-event-emiter
+  document.onkeypress = function(e) {
+    module.run(e.keyCode);
+  }
+
+  window.KeyMonitor = module;
 })({});
 
-document.onkeypress = function(e) {
-  if(run[e.keyCode]) {
-    run[e.keyCode]();
-  } else {
-    console.info('invalid command:', e.keyCode);
-  }
-}
+
+

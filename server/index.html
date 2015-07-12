@@ -7,8 +7,9 @@
     <script src="/angular/angular.js"></script>
 
     <!-- local modules -->
+    <script src="/js/cmd-builder.js"></script>
+    <script src="/js/event-manager.js"></script>
     <script src="/js/key-monitor.js"></script>
-    <script src="/js/socket-event-manager.js"></script>
 
     <!-- angular app -->
     <script src="/app/app.js"></script>
@@ -25,15 +26,18 @@
         <small>Powered by Wargos</small>
         <button type="button"
                 class="btn btn-info"
-                bg-click="startStreaming()">
-          <span class="glyphicon glyphicon-facetime-video"></span>
-          <span class="">Video</span>
+                ng-click="changeCameraState()">
+          <span class="glyphicon glyphicon-facetime-video">
+          </span>
+          <span ng-if="!camaraState">Start video</span>
+          <span ng-if="camaraState">Stop video</span>
         </button>
       </h1>
       <hr>
       <div class="row text-center">
-        <img src="/images/wargos-logo.png"/>
-        <img src="data:image/jpeg;base64,{{imagedata}}"/>
+        <img ng-if="!camaraState" src="/images/wargos-logo.png"/>
+        <img ng-if="camaraState"
+             src="data:image/jpeg;base64,{{imagedata}}"/>
       </div>
       <div class="row text-center control-btns">
         <div ng-repeat="btns in control">
@@ -42,44 +46,11 @@
                   class="btn btn-info"
                   ng-click="move(btn)">
             <div ng-if="btn.icon">
-              <span ng-class="buildIcon(btn.icon)"></span>  
+              <span ng-class="buildIcon(btn.icon)"></span>
             </div>
             <div ng-if="!btn.icon">
-              <span>-</span>  
+              <span>-</span>
             </div>
-          </button>
-        </div>
-        <div>
-          <button type="button" id="" class="btn btn-info start" onclick="move()">
-            <span class="">-</span>
-          </button>
-          <button type="button" id="" class="btn btn-info start" onclick="move()">
-            <span class="glyphicon glyphicon-triangle-top"></span>
-          </button>
-          <button type="button" id="" class="btn btn-info start" onclick="move()">
-            <span class="">-</span>
-          </button>
-        </div>
-        <div>
-          <button type="button" id="" class="btn btn-info start" onclick="move()">
-            <span class="glyphicon glyphicon-triangle-left"></span>
-          </button>
-          <button type="button" id="" class="btn btn-info start" onclick="move()">
-            <span class="glyphicon glyphicon-ban-circle"></span>
-          </button>
-          <button type="button" id="" class="btn btn-info start" onclick="move()">
-            <span class="glyphicon glyphicon-triangle-right"></span>
-          </button>
-        </div>
-        <div>
-          <button type="button" id="" class="btn btn-info start" onclick="move()">
-            <span class="">-</span>
-          </button>
-          <button type="button" id="" class="btn btn-info start" onclick="move()">
-            <span class="glyphicon glyphicon-triangle-bottom"></span>
-          </button>
-          <button type="button" id="" class="btn btn-info start" onclick="move()">
-            <span class="">-</span>
           </button>
         </div>
       </div>

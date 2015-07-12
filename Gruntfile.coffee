@@ -19,6 +19,7 @@ module.exports = (grunt) ->
           watch: ['server']
           ext: 'js,html'
           delayTime: 1
+          args: ['false']
           cwd: __dirname
     watch:
       scripts:

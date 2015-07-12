@@ -5,8 +5,10 @@ var io = require('socket.io')(http);
 var path = require("path");
 var ServerManager = require('./server_manager')(io);
 
-app.use(express.static(path.join(__dirname + '/../public')));
-app.use(express.static(path.join(__dirname + '/../bower_components')));
+app.use(express.static(
+  path.join(__dirname + '/../public')));
+app.use(express.static(
+  path.join(__dirname + '/../bower_components')));
 
 app.get('/', function (req, res) {
   res.sendFile(path.join( __dirname + '/index.html'));

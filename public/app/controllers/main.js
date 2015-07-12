@@ -1,39 +1,29 @@
 angular.module('main')
 .controller('mainController', mainController);
 
-console.log(SocketManager);
-
 function mainController($rootScope, $scope) {
 
-  $scope.control = [
-    [
+  $scope.camaraState = false;
+  $scope.control = [[
       {key: 55, label:'-'},
       {key: 56, icon:'glyphicon-triangle-top'},
       {key: 57, label:'-'}
-    ],
-    [
+    ], [
       {key: 52, icon:'glyphicon-triangle-left'},
       {key: 53, icon:'glyphicon-ban-circle'},
       {key: 54, icon:'glyphicon-triangle-right'}
-    ],
-    [
+    ], [
       {key: 49, label:'-'},
       {key: 50, icon:'glyphicon-triangle-bottom'},
       {key: 51, label:'-'}
     ]
-  ]
+  ];
 
-  $scope.name = "lagg";
-  SocketManager.on(function(message) {
-    $scope.data = message;
+  EventManager.message(function(message) {
     console.log(message);
-    // $scope.generate.apply($scope.generate, [msg]);
-    // $rootScope.$apply(function() {
-    //   $scope.generate.apply(this, [msg]);
-    // });
   });
 
-  SocketManager.streaming(function(data) {
+  EventManager.streaming(function(data) {
     var strin64Image = data.data;
     $scope.imagedata = strin64Image;
     $rootScope.$apply();
@@ -43,15 +33,22 @@ function mainController($rootScope, $scope) {
     $scope.data = msg;
   }
 
-  $scope.startStreaming = function() {
-    console.log('Start streaming');
+  // Camara State
+  $scope.changeCameraState = function() {
+    if ($scope.camaraState) {
+      EventManager.emit.camera.stop();
+      $scope.camaraState = false;
+    } else {
+      EventManager.emit.camera.start();
+      $scope.camaraState = true;
+    }
   }
 
   $scope.move = function(btn) {
     if (!btn) {
       throw new Error('there is no btn asociated to this btn');
     };
-    remote.move(btn.key);
+    KeyMonitor.run(btn.key);
   }
 
   $scope.buildIcon = function(icon) {
