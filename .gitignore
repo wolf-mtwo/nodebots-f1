@@ -5,3 +5,4 @@
 node_modules/
 bower_components/
 server/stream/*.jpg
+server/stream/*.jpg~

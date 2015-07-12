@@ -4,7 +4,7 @@ var decode = require('./decode');
 
 var Gpio = null;
 if (utils.getEnvironmentState()) {
-  Gpio = require("onoff");
+  Gpio = require("onoff").Gpio;
 } else {
   Gpio = require("../../mock/onoff");
 }
@@ -40,7 +40,7 @@ module.exports = (function(module) {
       if (!commandState) throw new error('commandState is undefined');
       var gpio = drive[commandState.command];
       if (gpio) {
-        gpio.writeSync(commandState.value);
+        gpio.writeSync(parseInt(commandState.value));
       } else {
         console.log('command not found', commandState);
       }
