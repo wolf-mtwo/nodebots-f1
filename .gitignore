@@ -4,4 +4,4 @@
 .idea/
 node_modules/
 bower_components/
-#server/stream/parser.jpg
+server/stream/parser.jpg
